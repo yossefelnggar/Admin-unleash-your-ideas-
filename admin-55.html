@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0620">
+<meta name="robots" content="noindex, nofollow">
+<title>لوحة إدارة | عالم المبتكرين</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%91%91%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0620;--bg2:#150a33;
+  --surface:rgba(255,255,255,.045);--surface2:rgba(255,255,255,.09);--surface3:rgba(255,255,255,.14);
+  --text:#f6f3ff;--muted:#a79cd1;--muted2:#7c6fa3;
+  --primary:#8b5cf6;--primary2:#5b21b6;--accent:#f472b6;--accent2:#fb923c;
+  --success:#22c55e;--danger:#f43f5e;--warn:#fb923c;
+  --border:rgba(255,255,255,.11);--border-strong:rgba(255,255,255,.2);
+  --grad-cta:linear-gradient(135deg,#ec4899,#f97316);
+  --grad-brand:linear-gradient(135deg,#8b5cf6,#ec4899);
+  --r:16px;--r-sm:11px;
+  --shadow:0 20px 55px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Tajawal',system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:
+  radial-gradient(ellipse 900px 500px at 15% -5%,rgba(139,92,246,.32),transparent 60%),
+  radial-gradient(ellipse 700px 500px at 100% 10%,rgba(244,114,182,.16),transparent 55%),
+  var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+h1,h2,h3{font-family:'Cairo',sans-serif}
+button{font-family:inherit;cursor:pointer;border:0;outline:0}
+input,select,textarea{font-family:inherit;outline:0}
+a{cursor:pointer;color:var(--text);text-decoration:none}
+.hidden{display:none!important}
+.wrap{max-width:1180px;margin:auto;padding:22px 20px 60px}
+
+/* شاشة الدخول */
+#gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.gatebox{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:34px 28px;max-width:380px;width:100%;text-align:center;box-shadow:var(--shadow)}
+.gatebox .emoji{font-size:42px;margin-bottom:10px}
+.gatebox h1{font-size:20px;margin-bottom:6px}
+.gatebox p{color:var(--muted);font-size:13.5px;margin-bottom:20px}
+.field{margin-bottom:12px;text-align:right}
+.field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:5px;font-weight:700}
+.field input{width:100%;padding:11px 13px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px}
+.field input:focus{border-color:var(--primary)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--grad-brand);color:#fff;padding:11px 18px;border-radius:11px;font-weight:800;font-size:14px;transition:.2s;white-space:nowrap}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn:disabled{opacity:.55;pointer-events:none}
+.btn.secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn.danger{background:var(--danger)}
+.btn.success{background:var(--success)}
+.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn.sm{padding:7px 12px;font-size:12.5px;border-radius:9px}
+.err{color:var(--danger);font-size:12.5px;margin-top:8px;min-height:16px}
+
+/* الهيدر */
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);background:rgba(9,5,25,.55);backdrop-filter:blur(14px);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:10px}
+.logo{display:flex;align-items:center;gap:10px;font-family:'Cairo',sans-serif;font-weight:900;font-size:16px}
+.logo .mark{width:34px;height:34px;border-radius:10px;background:var(--grad-brand);display:flex;align-items:center;justify-content:center;font-size:16px}
+.who{font-size:12.5px;color:var(--muted)}
+
+/* تنقل */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0}
+.tabs button{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:9px 16px;border-radius:11px;font-weight:800;font-size:13px}
+.tabs button.active{background:var(--grad-brand);color:#fff;border-color:transparent}
+
+/* بطاقات إحصائية */
+.statsgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:800px){.statsgrid{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:16px;text-align:center}
+.stat b{font-size:24px;display:block;font-family:'Cairo',sans-serif}
+.stat span{font-size:12px;color:var(--muted)}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:18px;margin-bottom:16px}
+.card h3{font-size:15px;margin-bottom:10px}
+
+/* جداول */
+.tablewrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r-sm)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:600px}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap}
+th{color:var(--muted);font-size:12px;background:var(--surface2);position:sticky;top:0}
+tr:last-child td{border-bottom:0}
+tr:hover td{background:var(--surface2)}
+.pill{display:inline-flex;align-items:center;gap:4px;background:var(--surface3);padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700}
+.pill.on{background:rgba(34,197,94,.18);color:#4ade80}
+.toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.toolbar input,.toolbar select{padding:9px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px}
+.toolbar input{flex:1;min-width:180px}
+.empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13.5px}
+.muted{color:var(--muted)}
+.reason{max-width:260px;white-space:normal;font-size:12px;color:var(--muted)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--border);border-inline-start:3px solid var(--primary);padding:12px 18px;border-radius:12px;font-size:13.5px;opacity:0;pointer-events:none;transition:.3s;z-index:999;box-shadow:var(--shadow)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gatebox">
+    <div class="emoji">👑</div>
+    <h1>لوحة إدارة عالم المبتكرين</h1>
+    <p>سجّل الدخول بحساب أدمن معتمد للمتابعة</p>
+    <div class="field"><label>البريد الإلكتروني</label><input id="gEmail" type="email" autocomplete="email"></div>
+    <div class="field"><label>كلمة المرور</label><input id="gPass" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')gateLogin()"></div>
+    <button class="btn" id="gateBtn" style="width:100%" onclick="gateLogin()">دخول</button>
+    <div class="err" id="gateErr"></div>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <header>
+    <div class="logo"><div class="mark">👑</div> لوحة إدارة عالم المبتكرين</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span class="who" id="whoAmI"></span>
+      <a class="btn secondary sm" href="index.html">↩️ رجوع للمنصة</a>
+      <button class="btn ghost sm" onclick="adminLogout()">خروج</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="tabs" id="tabs">
+      <button class="active" onclick="setTab('overview')">📊 نظرة عامة</button>
+      <button onclick="setTab('users')">👥 المستخدمون</button>
+      <button onclick="setTab('ideas')">💡 الأفكار</button>
+      <button onclick="setTab('museum')">🏛️ المؤرشفة</button>
+      <button onclick="setTab('reports')">🚨 البلاغات</button>
+      <button onclick="setTab('admins')">🔑 صلاحيات الأدمن</button>
+      <button onclick="setTab('config')">⚙️ الإعدادات</button>
+    </div>
+    <div id="content"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+import { getDatabase, ref, set, update, remove, onValue, get } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+
+// نفس إعدادات Firebase المستخدمة في index.html — لازم يفضلوا متطابقين دايمًا
+const firebaseConfig = {
+  apiKey:"AIzaSyAAM11KB7jbdZC0EiPyOgIawxzGZITgMA8",
+  authDomain:"flash-feedback-9c529.firebaseapp.com",
+  databaseURL:"https://flash-feedback-9c529-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"flash-feedback-9c529",
+  storageBucket:"flash-feedback-9c529.firebasestorage.app",
+  messagingSenderId:"1026286586523",
+  appId:"1:1026286586523:web:b76e33473c260fc4d7143e",
+  measurementId:"G-R93914YBXY"
+};
+const app=initializeApp(firebaseConfig), auth=getAuth(app), db=getDatabase(app);
+const $=id=>document.getElementById(id);
+function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function fmt(ts){return ts?new Date(ts).toLocaleDateString("ar-EG",{year:"numeric",month:"short",day:"numeric"}):"-"}
+function toast(msg){$("toast").textContent=msg;$("toast").classList.add("show");clearTimeout(window.__t);window.__t=setTimeout(()=>$("toast").classList.remove("show"),2800)}
+
+let currentUser=null, adminMap={}, verifiedMap={}, allUsers=[], allIdeas=[], allReports=[], config={}, currentTab="overview";
+
+window.gateLogin=async()=>{
+ const email=$("gEmail").value.trim(), pass=$("gPass").value;
+ if(!email||!pass){$("gateErr").textContent="أدخل البريد وكلمة المرور";return}
+ $("gateBtn").disabled=true; $("gateBtn").textContent="جارٍ الدخول...";
+ $("gateErr").textContent="";
+ try{
+  await signInWithEmailAndPassword(auth,email,pass);
+ }catch(e){
+  $("gateErr").textContent="بيانات الدخول غير صحيحة";
+ }finally{
+  $("gateBtn").disabled=false; $("gateBtn").textContent="دخول";
+ }
+};
+window.adminLogout=async()=>{await signOut(auth)};
+
+onAuthStateChanged(auth,async user=>{
+ if(!user){currentUser=null;$("gate").classList.remove("hidden");$("app").classList.add("hidden");return}
+ const adminSnap=await get(ref(db,"admins/"+user.uid));
+ if(!adminSnap.val()){
+  $("gateErr").textContent="هذا الحساب غير مصرّح له بدخول لوحة الإدارة";
+  await signOut(auth);
+  return;
+ }
+ currentUser=user;
+ $("gate").classList.add("hidden"); $("app").classList.remove("hidden");
+ $("whoAmI").textContent=user.email;
+ bindData();
+});
+
+function bindData(){
+ onValue(ref(db,"admins"),snap=>{adminMap=snap.val()||{};renderTab()});
+ onValue(ref(db,"verified"),snap=>{verifiedMap=snap.val()||{};renderTab()});
+ onValue(ref(db,"users"),snap=>{allUsers=Object.values(snap.val()||{});renderTab()});
+ onValue(ref(db,"ideas"),snap=>{const d=snap.val()||{};allIdeas=Object.entries(d).map(([id,v])=>({id,...v}));renderTab()});
+ onValue(ref(db,"reports"),snap=>{allReports=Object.entries(snap.val()||{}).map(([id,v])=>({id,...v}));renderTab()});
+ onValue(ref(db,"config"),snap=>{config=snap.val()||{};renderTab()});
+}
+
+window.setTab=(tab)=>{
+ currentTab=tab;
+ document.querySelectorAll("#tabs button").forEach((b,i)=>b.classList.toggle("active",["overview","users","ideas","museum","reports","admins","config"][i]===tab));
+ renderTab();
+};
+
+function likesCount(x){return Object.keys(x.likes||{}).length}
+
+function renderTab(){
+ if(!currentUser)return;
+ if(currentTab==="overview")return renderOverview();
+ if(currentTab==="users")return renderUsers();
+ if(currentTab==="ideas")return renderIdeas();
+ if(currentTab==="museum")return renderMuseum();
+ if(currentTab==="reports")return renderReports();
+ if(currentTab==="admins")return renderAdmins();
+ if(currentTab==="config")return renderConfig();
+}
+
+function renderOverview(){
+ const activeIdeas=allIdeas.filter(x=>x.status!=="draft"&&x.status!=="archived");
+ const launched=allIdeas.filter(x=>x.status==="launched");
+ const archived=allIdeas.filter(x=>x.status==="archived");
+ const openReports=allReports.filter(r=>r.status!=="closed");
+ const totalLikes=allIdeas.reduce((n,x)=>n+likesCount(x),0);
+ const totalViews=allIdeas.reduce((n,x)=>n+(x.views||0),0);
+ // أنشط 5 فئات
+ const catCounts={};
+ activeIdeas.forEach(x=>{catCounts[x.category]=(catCounts[x.category]||0)+1});
+ const topCats=Object.entries(catCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+ $("content").innerHTML=`
+ <div class="statsgrid">
+  <div class="stat"><b>${allUsers.length}</b><span>👥 مستخدم مسجّل</span></div>
+  <div class="stat"><b>${activeIdeas.length}</b><span>💡 فكرة نشطة</span></div>
+  <div class="stat"><b>${launched.length}</b><span>🚀 مشروع مُطلق</span></div>
+  <div class="stat"><b>${openReports.length}</b><span>🚨 بلاغ مفتوح</span></div>
+  <div class="stat"><b>${totalLikes}</b><span>❤️ إجمالي الإعجابات</span></div>
+  <div class="stat"><b>${totalViews}</b><span>👁️ إجمالي المشاهدات</span></div>
+  <div class="stat"><b>${archived.length}</b><span>🏛️ فكرة مؤرشفة</span></div>
+  <div class="stat"><b>${Object.keys(verifiedMap).length}</b><span>✔️ حساب موثّق</span></div>
+ </div>
+ <div class="card">
+  <h3>📈 أنشط المجالات حاليًا</h3>
+  ${topCats.length?topCats.map(([name,count])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>${escapeHtml(name)}</span><b>${count}</b></div>`).join(""):`<p class="muted">لا توجد بيانات كافية بعد.</p>`}
+ </div>
+ <div class="card">
+  <h3>⚡ حالة النظام</h3>
+  <p class="muted">Firebase Auth + Realtime Database متصلان بنجاح. رابط الدعم الحالي: <b>${config.supportUrl?escapeHtml(config.supportUrl):"غير مضبوط"}</b></p>
+ </div>`;
+}
+
+function renderUsers(){
+ $("content").innerHTML=`
+ <div class="toolbar"><input id="userSearch" placeholder="ابحث بالاسم أو البريد أو UID..." oninput="renderUsers()"></div>
+ <div class="tablewrap"><table>
+ <tr><th>الاسم</th><th>البريد</th><th>UID</th><th>تاريخ التسجيل</th><th>الحالة</th><th>إجراءات</th></tr>
+ ${filteredUsers().map(u=>`<tr>
+  <td>${escapeHtml(u.displayName||"-")}</td>
+  <td>${escapeHtml(u.email||"-")}</td>
+  <td style="font-size:11px;color:var(--muted)">${escapeHtml(u.uid||"-")}</td>
+  <td>${fmt(u.createdAt)}</td>
+  <td>${adminMap[u.uid]?'<span class="pill on">👑 أدمن</span>':""} ${verifiedMap[u.uid]?'<span class="pill on">✔️ موثّق</span>':""}</td>
+  <td style="display:flex;gap:6px">
+   <button class="btn ${verifiedMap[u.uid]?"secondary":"success"} sm" onclick="toggleVerified('${u.uid}')">${verifiedMap[u.uid]?"إلغاء التوثيق":"توثيق"}</button>
+   <button class="btn ${adminMap[u.uid]?"danger":"secondary"} sm" onclick="toggleAdmin('${u.uid}')">${adminMap[u.uid]?"إزالة أدمن":"ترقية لأدمن"}</button>
+  </td>
+ </tr>`).join("")||`<tr><td colspan="6">لا يوجد مستخدمون بعد.</td></tr>`}
+ </table></div>`;
+}
+function filteredUsers(){
+ const q=($("userSearch")?.value||"").toLowerCase().trim();
+ if(!q)return allUsers;
+ return allUsers.filter(u=>[u.displayName,u.email,u.uid].join(" ").toLowerCase().includes(q));
+}
+window.renderUsers=renderUsers;
+window.toggleVerified=async(uid)=>{
+ if(verifiedMap[uid])await remove(ref(db,"verified/"+uid)); else await set(ref(db,"verified/"+uid),true);
+ toast("تم تحديث حالة التوثيق");
+};
+window.toggleAdmin=async(uid)=>{
+ if(uid===currentUser.uid){toast("لا يمكنك إزالة صلاحيتك عن نفسك من هنا");return}
+ if(adminMap[uid])await remove(ref(db,"admins/"+uid)); else await set(ref(db,"admins/"+uid),true);
+ toast("تم تحديث صلاحيات الأدمن");
+};
+
+function renderIdeas(){
+ const list=allIdeas.filter(x=>x.status!=="archived");
+ $("content").innerHTML=`
+ <div class="toolbar">
+  <input id="ideaSearch" placeholder="ابحث بعنوان الفكرة أو صاحبها..." oninput="renderIdeas()">
+  <select id="ideaStatusFilter" onchange="renderIdeas()">
+   <option value="all">كل الحالات</option><option value="draft">مسودة</option><option value="idea">فكرة</option><option value="team">بحث عن فريق</option><option value="progress">قيد التطوير</option><option value="launched">مُطلق</option>
+  </select>
+ </div>
+ <div class="tablewrap"><table>
+ <tr><th>العنوان</th><th>صاحبها</th><th>المجال</th><th>الحالة</th><th>❤️</th><th>👁️</th><th>التاريخ</th><th>إجراء</th></tr>
+ ${filteredIdeas(list).map(x=>`<tr>
+  <td style="max-width:220px;white-space:normal">${escapeHtml(x.title)}</td>
+  <td>${escapeHtml(x.authorName||"-")}</td>
+  <td>${escapeHtml(x.category||"-")}</td>
+  <td><span class="pill">${statusLabel(x.status)}</span></td>
+  <td>${likesCount(x)}</td>
+  <td>${x.views||0}</td>
+  <td>${fmt(x.createdAt)}</td>
+  <td><button class="btn danger sm" onclick="deleteIdea('${x.id}')">حذف</button></td>
+ </tr>`).join("")||`<tr><td colspan="8">لا توجد نتائج مطابقة.</td></tr>`}
+ </table></div>`;
+}
+function statusLabel(s){return {draft:"📝 مسودة",idea:"💡 فكرة",team:"👥 بحث فريق",progress:"🛠️ تطوير",launched:"🚀 مُطلق",archived:"🏛️ مؤرشفة"}[s||"idea"]||s}
+function filteredIdeas(list){
+ const q=($("ideaSearch")?.value||"").toLowerCase().trim();
+ const sf=$("ideaStatusFilter")?.value||"all";
+ return list.filter(x=>{
+  if(sf!=="all"&&(x.status||"idea")!==sf)return false;
+  if(q&&!(x.title+" "+(x.authorName||"")).toLowerCase().includes(q))return false;
+  return true;
+ });
+}
+window.renderIdeas=renderIdeas;
+window.deleteIdea=async(id)=>{
+ if(!confirm("حذف هذه الفكرة نهائيًا؟ لا يمكن التراجع."))return;
+ await remove(ref(db,"ideas/"+id));
+ toast("تم حذف الفكرة");
+};
+
+function renderMuseum(){
+ const list=allIdeas.filter(x=>x.status==="archived").sort((a,b)=>(b.archivedAt||0)-(a.archivedAt||0));
+ $("content").innerHTML=`
+ <div class="card"><p class="muted">الأفكار هنا اختار أصحابها أرشفتها بدل حذفها، مع توضيح سبب التوقف — تقدر تراجع الأسباب أو تحذفها نهائيًا لو كانت غير لائقة.</p></div>
+ <div class="tablewrap"><table>
+ <tr><th>العنوان</th><th>صاحبها</th><th>سبب التوقف</th><th>تاريخ الأرشفة</th><th>إجراء</th></tr>
+ ${list.map(x=>`<tr>
+  <td>${escapeHtml(x.title)}</td><td>${escapeHtml(x.authorName||"-")}</td>
+  <td class="reason">${escapeHtml(x.archiveReason||"-")}</td>
+  <td>${fmt(x.archivedAt||x.createdAt)}</td>
+  <td><button class="btn danger sm" onclick="deleteIdea('${x.id}')">حذف نهائي</button></td>
+ </tr>`).join("")||`<tr><td colspan="5">لا توجد أفكار مؤرشفة بعد.</td></tr>`}
+ </table></div>`;
+}
+
+function renderReports(){
+ $("content").innerHTML=`
+ <div class="toolbar"><select id="reportFilter" onchange="renderReports()"><option value="open">مفتوحة فقط</option><option value="all">الكل</option></select></div>
+ <div class="tablewrap"><table>
+ <tr><th>السبب</th><th>الفكرة</th><th>المُبلِّغ</th><th>التاريخ</th><th>الحالة</th><th>إجراء</th></tr>
+ ${filteredReports().map(r=>`<tr>
+  <td>${escapeHtml(r.reason||"-")}</td>
+  <td>${escapeHtml(allIdeas.find(x=>x.id===r.ideaId)?.title||"محذوفة")}</td>
+  <td style="font-size:11px">${escapeHtml(r.reporterEmail||"-")}</td>
+  <td>${fmt(r.createdAt)}</td>
+  <td><span class="pill ${r.status==="closed"?"":"on"}">${r.status==="closed"?"مغلق":"مفتوح"}</span></td>
+  <td>${r.status!=="closed"?`<button class="btn secondary sm" onclick="closeReport('${r.id}')">إغلاق البلاغ</button>`:""}</td>
+ </tr>`).join("")||`<tr><td colspan="6">لا توجد بلاغات.</td></tr>`}
+ </table></div>`;
+}
+function filteredReports(){
+ const f=$("reportFilter")?.value||"open";
+ return f==="open"?allReports.filter(r=>r.status!=="closed"):allReports;
+}
+window.renderReports=renderReports;
+window.closeReport=async(id)=>{await update(ref(db,"reports/"+id),{status:"closed"});toast("تم إغلاق البلاغ")};
+
+function renderAdmins(){
+ const admins=allUsers.filter(u=>adminMap[u.uid]);
+ $("content").innerHTML=`
+ <div class="card">
+  <h3>➕ منح صلاحية أدمن عبر UID</h3>
+  <p class="muted" style="margin-bottom:10px">انسخ الـ UID من تبويب "المستخدمون" ثم الصقه هنا.</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><input id="newAdminUid" placeholder="UID المستخدم" style="flex:1;min-width:220px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text)"><button class="btn" onclick="addAdminByUid()">منح صلاحية أدمن</button></div>
+ </div>
+ <div class="tablewrap"><table>
+ <tr><th>الاسم</th><th>البريد</th><th>UID</th><th>إجراء</th></tr>
+ ${admins.map(u=>`<tr><td>${escapeHtml(u.displayName||"-")}</td><td>${escapeHtml(u.email||"-")}</td><td style="font-size:11px">${escapeHtml(u.uid)}</td>
+  <td>${u.uid!==currentUser.uid?`<button class="btn danger sm" onclick="toggleAdmin('${u.uid}')">إزالة الصلاحية</button>`:`<span class="muted" style="font-size:12px">أنت</span>`}</td></tr>`).join("")||`<tr><td colspan="4">لا يوجد أدمن آخر بعد.</td></tr>`}
+ </table></div>`;
+}
+window.addAdminByUid=async()=>{
+ const uid=$("newAdminUid").value.trim();
+ if(!uid){toast("أدخل UID صحيح");return}
+ await set(ref(db,"admins/"+uid),true);
+ $("newAdminUid").value=""; toast("✅ تم منح صلاحية الأدمن");
+};
+
+function renderConfig(){
+ $("content").innerHTML=`
+ <div class="card">
+  <h3>💳 رابط بوابة الدعم / التبرع</h3>
+  <p class="muted" style="margin-bottom:10px">هذا الرابط يظهر للمستخدمين عند الضغط على "متابعة الدعم" في المنصة الرئيسية.</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><input id="supportUrlInput" placeholder="https://..." value="${escapeHtml(config.supportUrl||"")}" style="flex:1;min-width:220px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text)"><button class="btn" onclick="saveSupportUrl()">حفظ</button></div>
+ </div>
+ <div class="card">
+  <h3>ℹ️ ملاحظات</h3>
+  <p class="muted">هذه اللوحة تتصل بنفس قاعدة بيانات Firebase المستخدمة في index.html. أي تعديل هنا (توثيق، صلاحيات أدمن، حذف أفكار، إغلاق بلاغات) ينعكس فورًا على المنصة الرئيسية لكل المستخدمين.</p>
+ </div>`;
+}
+window.saveSupportUrl=async()=>{
+ const url=$("supportUrlInput").value.trim();
+ await update(ref(db,"config"),{supportUrl:url});
+ toast("✅ تم حفظ رابط الدعم");
+};
+</script>
+</body>
+</html>
