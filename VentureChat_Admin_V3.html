@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>لوحة تحكم VentureChat</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f5f3ee;--paper:#fff;--ink:#171512;--muted:#77716a;--line:#171512;
+  --brand:#6c4dfb;--soft:#eeeae3;--danger:#e5484d;--ok:#13a673;--warn:#e0a020;
+  --shadow:3px 3px 0 var(--line);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Cairo,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,textarea{font:inherit}
+.hidden{display:none!important}
+
+#topbar{position:sticky;top:0;z-index:50;background:rgba(245,243,238,.97);backdrop-filter:blur(10px);border-bottom:2px solid var(--line);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#topbar h1{font-size:16px;margin:0;display:flex;align-items:center;gap:8px}
+#topStatus{font-size:11.5px;color:var(--muted)}
+.icon-btn{border:2px solid var(--line);background:#fff;border-radius:11px;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:2px 2px 0 var(--line)}
+.icon-btn:active{transform:translate(2px,2px);box-shadow:none}
+
+#tabs{display:flex;gap:8px;padding:12px 16px 0;overflow-x:auto;max-width:1000px;margin:0 auto}
+.tab-btn{border:2px solid var(--line);background:#fff;border-radius:13px 13px 0 0;padding:10px 16px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;border-bottom:none;opacity:.6}
+.tab-btn.active{opacity:1;background:var(--paper);box-shadow:var(--shadow)}
+
+#content{max-width:1000px;margin:0 auto;padding:18px 16px 60px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:18px}
+.stat-card{background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.stat-card .num{font-size:26px;font-weight:800}
+.stat-card .lbl{font-size:12px;color:var(--muted);margin-top:4px}
+
+.chart-card{background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.chart-card h3{margin:0 0 12px;font-size:14px}
+
+.row-card{background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.row-main{display:flex;align-items:center;gap:10px;min-width:0}
+.row-avatar,.row-avatar-img{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);background:var(--soft);display:grid;place-items:center;font-weight:800;flex:0 0 auto;object-fit:cover;font-size:15px}
+.row-avatar-wrap{position:relative;flex:0 0 auto}
+.row-avatar-wrap.online::after{content:"";position:absolute;inset-inline-end:-2px;inset-block-end:-2px;width:11px;height:11px;border-radius:50%;background:var(--ok);border:2px solid var(--paper)}
+.row-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+.row-info strong{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-sub{font-size:11.5px;color:var(--muted)}
+.row-actions{display:flex;gap:8px;flex:0 0 auto}
+.mini-btn{border:2px solid var(--line);background:#fff;border-radius:10px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer}
+.mini-btn.danger{background:#fff1f1;border-color:var(--danger);color:#9b1c1c}
+.badge{font-size:10.5px;font-weight:800;border-radius:20px;padding:3px 9px}
+.badge.danger{background:#fff1f1;color:#9b1c1c;border:1px solid var(--danger)}
+.empty-note{text-align:center;color:var(--muted);padding:40px 15px;font-size:13px}
+
+#broadcastForm{background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+#broadcastForm textarea{width:100%;min-height:110px;border:2px solid var(--line);border-radius:12px;padding:11px 13px;resize:vertical;outline:none;margin-bottom:10px}
+#broadcastForm textarea:focus{box-shadow:2px 2px 0 var(--brand)}
+.primary{border:2px solid var(--line);border-radius:12px;padding:11px 18px;background:var(--brand);color:#fff;font-weight:800;cursor:pointer;box-shadow:2px 2px 0 var(--line)}
+.primary:active{transform:translate(2px,2px);box-shadow:none}
+.broadcast-hint{font-size:11.5px;color:var(--muted);margin-top:10px}
+
+.overlay{position:fixed;inset:0;z-index:500;background:var(--bg);display:none;flex-direction:column}
+.overlay.open{display:flex}
+.overlay-head{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:2px solid var(--line);background:rgba(245,243,238,.97)}
+.overlay-head strong{flex:1;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.back-btn{border:2px solid var(--line);background:#fff;border-radius:10px;width:36px;height:36px;font-size:16px;cursor:pointer}
+.overlay-list{flex:1;overflow-y:auto;padding:14px 16px;max-width:800px;margin:0 auto;width:100%}
+.msg-row{background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.msg-row-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.msg-row-head strong{font-size:12.5px}
+.msg-row-head .row-sub{flex:1}
+.msg-row-text{font-size:13.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.msg-row-img{max-width:220px;max-height:220px;border-radius:9px;border:2px solid var(--line);display:block;margin-top:6px}
+
+#toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:900;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast-item{background:var(--ink);color:#fff;border-radius:12px;padding:9px 16px;font-size:13px;box-shadow:var(--shadow);animation:toastIn .18s ease-out}
+.toast-item.error{background:var(--danger)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<header id="topbar">
+  <h1>🛡️ لوحة تحكم VentureChat</h1>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span id="topStatus">جاري الاتصال...</span>
+    <button id="refreshBtn" class="icon-btn" type="button">↻ تحديث</button>
+  </div>
+</header>
+
+<nav id="tabs">
+  <button class="tab-btn active" data-tab="tab-dashboard" type="button">📊 لوحة المعلومات</button>
+  <button class="tab-btn" data-tab="tab-users" type="button">👥 المستخدمين</button>
+  <button class="tab-btn" data-tab="tab-convs" type="button">💬 المحادثات والجروبات</button>
+  <button class="tab-btn" data-tab="tab-geo" type="button">🌍 التوزيع الجغرافي</button>
+  <button class="tab-btn" data-tab="tab-broadcast" type="button">📢 إعلان للمجموعة</button>
+</nav>
+
+<main id="content">
+
+  <section id="tab-dashboard" class="tab-panel active">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num" id="statUsers">—</div><div class="lbl">إجمالي المستخدمين</div></div>
+      <div class="stat-card"><div class="num" id="statOnline">—</div><div class="lbl">متصل الآن</div></div>
+      <div class="stat-card"><div class="num" id="statConvs">—</div><div class="lbl">إجمالي المحادثات</div></div>
+      <div class="stat-card"><div class="num" id="statMessages">—</div><div class="lbl">إجمالي الرسائل</div></div>
+      <div class="stat-card"><div class="num" id="statBanned">—</div><div class="lbl">مستخدمين محظورين</div></div>
+    </div>
+    <div class="chart-card">
+      <h3>عدد الرسائل خلال آخر 7 أيام</h3>
+      <canvas id="msgChart" height="90"></canvas>
+    </div>
+  </section>
+
+  <section id="tab-users" class="tab-panel">
+    <div id="usersList"><div class="empty-note">جاري التحميل...</div></div>
+  </section>
+
+  <section id="tab-convs" class="tab-panel">
+    <div id="convList"><div class="empty-note">جاري التحميل...</div></div>
+  </section>
+
+  <section id="tab-geo" class="tab-panel">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num" id="statCities">—</div><div class="lbl">عدد المدن المسجّلة</div></div>
+      <div class="stat-card"><div class="num" id="statNoCity">—</div><div class="lbl">مستخدمين بدون مدينة</div></div>
+    </div>
+    <div class="chart-card">
+      <h3>توزيع المستخدمين حسب المدينة</h3>
+      <canvas id="cityChart" height="140"></canvas>
+    </div>
+  </section>
+
+  <section id="tab-broadcast" class="tab-panel">
+    <form id="broadcastForm">
+      <label class="row-sub" style="display:block;margin-bottom:6px">إرسال إلى:</label>
+      <select id="broadcastTarget" class="field" style="width:100%;border:2px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px"></select>
+      <textarea id="broadcastInput" maxlength="2000" placeholder="اكتب إعلانًا يوصل لكل مستخدمي الجروب المختار..."></textarea>
+      <button class="primary" type="submit">إرسال الإعلان 📢</button>
+      <p class="broadcast-hint">هيظهر في الجروب المختار باسم "🛡️ الإدارة" لكل المستخدمين فورًا.</p>
+    </form>
+  </section>
+
+</main>
+
+<div id="convViewer" class="overlay" aria-hidden="true">
+  <div class="overlay-head">
+    <button id="convViewerClose" class="back-btn" type="button">→</button>
+    <strong id="convViewerTitle"></strong>
+    <button id="convViewerClearAll" class="mini-btn danger" type="button">مسح الكل</button>
+  </div>
+  <div id="convViewerList" class="overlay-list"></div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script>
+// عايز تحمي اللوحة برقم سري؟ اكتبه هنا (مثلاً "1234"). سيبها فاضية يعني اللوحة بتفتح مباشرة من غير تسجيل دخول.
+const ADMIN_PIN = "";
+if (ADMIN_PIN) {
+  const entered = prompt("أدخل كود الدخول للوحة التحكم:");
+  if (entered !== ADMIN_PIN) {
+    document.body.innerHTML = "<div style='padding:60px 20px;text-align:center;font-family:Cairo,sans-serif;font-size:15px'>🚫 غير مصرح بالدخول</div>";
+    throw new Error("unauthorized");
+  }
+}
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAAM11KB7jbdZC0EiPyOgIawxzGZITgMA8",
+  authDomain: "flash-feedback-9c529.firebaseapp.com",
+  databaseURL: "https://flash-feedback-9c529-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "flash-feedback-9c529",
+  storageBucket: "flash-feedback-9c529.firebasestorage.app",
+  messagingSenderId: "1026286586523",
+  appId: "1:1026286586523:web:b76e33473c260fc4d7143e",
+  measurementId: "G-R93914YBXY"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+const $ = sel => document.querySelector(sel);
+function safeKey(name) {
+  return String(name || "").trim().replace(/[.#$\/\[\]]/g, "_").slice(0, 150) || "user";
+}
+function esc(v = "") {
+  return String(v).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[c]));
+}
+function fmtTime(v) {
+  if (!v) return "—";
+  const d = new Date(v);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleString("ar-EG", { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
+}
+function toast(msg, type="info") {
+  const box = $("#toast");
+  const el = document.createElement("div");
+  el.className = `toast-item ${type==="error" ? "error":""}`;
+  el.textContent = msg;
+  box.appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+function setTopStatus(msg, type="info") {
+  const el = $("#topStatus");
+  el.textContent = msg;
+  el.style.color = type==="error" ? "var(--danger)" : "var(--muted)";
+}
+
+const state = { users:{}, presence:{}, banned:{}, groupMeta:null, dmMeta:{}, groupMessages:{}, dmAll:{}, groups:{}, groupMetaMulti:{}, groupsAll:{}, bannedGroup:{} };
+
+function displayName(key){ return state.users[key]?.name || key; }
+
+/* ---- تحميل كل البيانات مرة واحدة (بما فيها الرسائل، لإحصائيات الداشبورد والمحادثات) ---- */
+async function loadAll(){
+  setTopStatus("جاري تحميل البيانات...");
+  try{
+    const [u,p,gm,dm,gmsg,dmAll,ban,groups,gmMulti,groupsAll,banGroup] = await Promise.all([
+      db.ref("chatUsers").once("value"),
+      db.ref("presence").once("value"),
+      db.ref("groupMeta").once("value"),
+      db.ref("dmMeta").once("value"),
+      db.ref("chats/private-chat/messages").once("value"),
+      db.ref("chats/dm").once("value"),
+      db.ref("banned").once("value"),
+      db.ref("groups").once("value"),
+      db.ref("groupMeta_multi").once("value"),
+      db.ref("chats/groups").once("value"),
+      db.ref("bannedGroup").once("value"),
+    ]);
+    state.users = u.val() || {};
+    state.presence = p.val() || {};
+    state.groupMeta = gm.val() || null;
+    state.dmMeta = dm.val() || {};
+    state.groupMessages = gmsg.val() || {};
+    state.dmAll = dmAll.val() || {};
+    state.banned = ban.val() || {};
+    state.groups = groups.val() || {};
+    state.groupMetaMulti = gmMulti.val() || {};
+    state.groupsAll = groupsAll.val() || {};
+    state.bannedGroup = banGroup.val() || {};
+    renderDashboard();
+    renderUsers();
+    renderConversations();
+    renderGeoDistribution();
+    populateBroadcastTargets();
+    setTopStatus("متصل — آخر تحديث " + new Date().toLocaleTimeString("ar-EG"));
+  }catch(e){
+    setTopStatus("تعذر تحميل البيانات (راجع Firebase Rules)", "error");
+    toast(e?.message || "خطأ غير معروف", "error");
+  }
+}
+
+// نستمع لايف بس للعُقد الخفيفة (المستخدمين/الحضور/الحظر/الميتاداتا)، مش للرسائل كلها، عشان الأداء
+function attachLiveListeners(){
+  db.ref("chatUsers").on("value", s => { state.users = s.val()||{}; renderUsers(); renderDashboard(); });
+  db.ref("presence").on("value", s => { state.presence = s.val()||{}; renderUsers(); renderDashboard(); });
+  db.ref("banned").on("value", s => { state.banned = s.val()||{}; renderUsers(); renderDashboard(); });
+  db.ref("groupMeta").on("value", s => { state.groupMeta = s.val()||null; renderConversations(); });
+  db.ref("dmMeta").on("value", s => { state.dmMeta = s.val()||{}; renderConversations(); });
+  db.ref("groups").on("value", s => { state.groups = s.val()||{}; renderConversations(); populateBroadcastTargets(); });
+  db.ref("groupMeta_multi").on("value", s => { state.groupMetaMulti = s.val()||{}; renderConversations(); });
+  db.ref("bannedGroup").on("value", s => { state.bannedGroup = s.val()||{}; if(activeConvViewer) renderConvMessages(activeConvViewerMsgsCache||{}); });
+}
+
+/* ---- لوحة المعلومات ---- */
+let chartInstance = null;
+function renderDashboard(){
+  const onlineCount = Object.values(state.presence).filter(p => p?.online).length;
+  const dmCount = Object.keys(state.dmMeta||{}).length;
+  const groupMsgCount = Object.keys(state.groupMessages||{}).length;
+  const groupsCount = Object.keys(state.groups||{}).length;
+  let dmMsgCount = 0;
+  Object.values(state.dmAll||{}).forEach(conv => { dmMsgCount += Object.keys(conv?.messages||{}).length; });
+  let extraGroupMsgCount = 0;
+  Object.values(state.groupsAll||{}).forEach(g => { extraGroupMsgCount += Object.keys(g?.messages||{}).length; });
+  const bannedCount = Object.values(state.banned||{}).filter(Boolean).length;
+
+  $("#statUsers").textContent = Object.keys(state.users).length;
+  $("#statOnline").textContent = onlineCount;
+  $("#statConvs").textContent = dmCount + 1 + groupsCount;
+  $("#statMessages").textContent = groupMsgCount + dmMsgCount + extraGroupMsgCount;
+  $("#statBanned").textContent = bannedCount;
+  renderChart();
+}
+function renderChart(){
+  const canvas = document.getElementById("msgChart");
+  if (!canvas || typeof Chart === "undefined") return;
+  const buckets = {}; const labels = [];
+  const now = new Date();
+  for (let i=6;i>=0;i--){
+    const d = new Date(now); d.setDate(d.getDate()-i); d.setHours(0,0,0,0);
+    buckets[d.toISOString().slice(0,10)] = 0;
+    labels.push(d.toLocaleDateString("ar-EG",{weekday:"short"}));
+  }
+  const all = [...Object.values(state.groupMessages||{})];
+  Object.values(state.dmAll||{}).forEach(conv => all.push(...Object.values(conv?.messages||{})));
+  Object.values(state.groupsAll||{}).forEach(g => all.push(...Object.values(g?.messages||{})));
+  all.forEach(m => {
+    if (!m?.createdAt) return;
+    const key = new Date(m.createdAt).toISOString().slice(0,10);
+    if (key in buckets) buckets[key]++;
+  });
+  const counts = Object.values(buckets);
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(canvas, {
+    type:"bar",
+    data:{ labels, datasets:[{ label:"الرسائل", data:counts, backgroundColor:"#6c4dfb", borderRadius:6, maxBarThickness:40 }] },
+    options:{ plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
+  });
+}
+
+/* ---- التوزيع الجغرافي ---- */
+let cityChartInstance = null;
+function renderGeoDistribution(){
+  const canvas = document.getElementById("cityChart");
+  if (!canvas || typeof Chart === "undefined") return;
+  const counts = {};
+  let noCity = 0;
+  Object.values(state.users||{}).forEach(u => {
+    const city = (u?.city||"").trim();
+    if (!city) { noCity++; return; }
+    counts[city] = (counts[city]||0) + 1;
+  });
+  const entries = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+  $("#statCities").textContent = entries.length;
+  $("#statNoCity").textContent = noCity;
+  if (cityChartInstance) cityChartInstance.destroy();
+  if (!entries.length){ return; }
+  cityChartInstance = new Chart(canvas, {
+    type:"bar",
+    data:{ labels: entries.map(e=>e[0]), datasets:[{ label:"عدد المستخدمين", data: entries.map(e=>e[1]), backgroundColor:"#6c4dfb", borderRadius:6, maxBarThickness:36 }] },
+    options:{ indexAxis:"y", plugins:{ legend:{ display:false } }, scales:{ x:{ beginAtZero:true, ticks:{ precision:0 } } } }
+  });
+}
+
+/* ---- المستخدمين ---- */
+function renderUsers(){
+  const box = $("#usersList");
+  const keys = Object.keys(state.users);
+  if (!keys.length){ box.innerHTML = `<div class="empty-note">لا يوجد مستخدمين بعد</div>`; return; }
+  box.innerHTML = keys.map(key => {
+    const u = state.users[key] || {};
+    const pres = state.presence[key];
+    const online = !!pres?.online;
+    const statusText = (online ? "متصل الآن" : (pres?.lastSeen ? "آخر ظهور " + fmtTime(pres.lastSeen) : "—")) + (u.city ? ` • 📍 ${u.city}` : "");
+    const banned = !!state.banned[key];
+    const av = u.avatar
+      ? `<img src="${esc(u.avatar)}" class="row-avatar-img" alt="">`
+      : `<div class="row-avatar">${esc((u.name||"?").charAt(0).toUpperCase())}</div>`;
+    return `
+      <div class="row-card">
+        <div class="row-main">
+          <div class="row-avatar-wrap ${online?"online":""}">${av}</div>
+          <div class="row-info">
+            <strong>${esc(u.name||key)}</strong>
+            <span class="row-sub">${esc(statusText)}</span>
+          </div>
+          ${banned ? `<span class="badge danger">محظور</span>` : ""}
+        </div>
+        <div class="row-actions">
+          <button class="mini-btn ${banned?"":"danger"}" data-act="ban" data-key="${esc(key)}">${banned?"فك الحظر":"حظر"}</button>
+          <button class="mini-btn danger" data-act="delete-user" data-key="${esc(key)}">حذف</button>
+        </div>
+      </div>`;
+  }).join("");
+  box.querySelectorAll("[data-act]").forEach(btn => {
+    btn.onclick = () => handleUserAction(btn.dataset.act, btn.dataset.key);
+  });
+}
+async function handleUserAction(act, key){
+  if (act === "ban"){
+    const isBanned = !!state.banned[key];
+    await db.ref("banned/"+key).set(isBanned ? null : true);
+    toast(isBanned ? "تم فك الحظر عن المستخدم" : "تم حظر المستخدم من الإرسال");
+  } else if (act === "delete-user"){
+    if (!confirm("حذف هذا المستخدم من القايمة؟ (رسائله السابقة هتفضل موجودة في المحادثات)")) return;
+    await Promise.all([ db.ref("chatUsers/"+key).remove(), db.ref("presence/"+key).remove() ]);
+    toast("تم حذف المستخدم من القايمة");
+  }
+}
+
+/* ---- المحادثات ---- */
+let convRows = [];
+function renderConversations(){
+  const box = $("#convList");
+  convRows = [{
+    id: "__group__", title: "المجموعة العامة", icon: "💬", isGroup:true, isDefault:true, banGroupId:"default",
+    count: Object.keys(state.groupMessages||{}).length,
+    lastAt: state.groupMeta?.lastAt || 0,
+    path: "chats/private-chat/messages", metaPath: "groupMeta"
+  }];
+  Object.entries(state.groups||{}).forEach(([id, g]) => {
+    convRows.push({
+      id, title: (g?.name||"جروب") + (g?.type==="city" ? " 📍" : ""), icon: g?.icon || "👥", isGroup:true, groupRegId:id, banGroupId:id,
+      count: Object.keys(state.groupsAll?.[id]?.messages||{}).length,
+      lastAt: state.groupMetaMulti?.[id]?.lastAt || 0,
+      path: `chats/groups/${id}/messages`, metaPath: `groupMeta_multi/${id}`
+    });
+  });
+  Object.keys(state.dmMeta||{}).forEach(pid => {
+    const names = pid.split("__").map(displayName).join(" ↔ ");
+    convRows.push({
+      id: pid, title: names, icon: "🗨️",
+      count: Object.keys(state.dmAll?.[pid]?.messages||{}).length,
+      lastAt: state.dmMeta[pid]?.lastAt || 0,
+      path: `chats/dm/${pid}/messages`, metaPath: `dmMeta/${pid}`
+    });
+  });
+  convRows.sort((a,b) => (b.lastAt||0) - (a.lastAt||0));
+  if (!convRows.length){ box.innerHTML = `<div class="empty-note">لا توجد محادثات بعد</div>`; return; }
+  box.innerHTML = convRows.map((r,i) => `
+    <div class="row-card">
+      <div class="row-main">
+        <div class="row-avatar">${r.icon}</div>
+        <div class="row-info">
+          <strong>${esc(r.title)}</strong>
+          <span class="row-sub">${r.count} رسالة • آخر نشاط ${fmtTime(r.lastAt)}</span>
+        </div>
+      </div>
+      <div class="row-actions">
+        <button class="mini-btn" data-idx="${i}" type="button">عرض</button>
+        ${r.isGroup ? `<button class="mini-btn" data-invite="${esc(r.banGroupId)}" type="button">🔗 نسخ رابط الدعوة</button>` : ""}
+        ${r.groupRegId ? `<button class="mini-btn danger" data-del-group="${esc(r.groupRegId)}" type="button">حذف الجروب</button>` : ""}
+      </div>
+    </div>`).join("");
+  box.querySelectorAll("[data-idx]").forEach(btn => {
+    btn.onclick = () => openConversationViewer(convRows[Number(btn.dataset.idx)]);
+  });
+  box.querySelectorAll("[data-invite]").forEach(btn => {
+    btn.onclick = async () => {
+      const suffix = `?group=${encodeURIComponent(btn.dataset.invite)}`;
+      try{ await navigator.clipboard.writeText(suffix); toast("تم نسخ الجزء ده: " + suffix + " — ضيفه آخر رابط تطبيق الشات وابعته"); }
+      catch(e){ prompt("انسخ ده وضيفه آخر رابط تطبيق الشات:", suffix); }
+    };
+  });
+  box.querySelectorAll("[data-del-group]").forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.dataset.delGroup;
+      const g = state.groups?.[id];
+      if (!confirm(`حذف جروب "${g?.name||id}" نهائيًا مع كل رسائله؟ الإجراء ده مينفعش يترجع.`)) return;
+      await Promise.all([
+        db.ref(`groups/${id}`).remove(),
+        db.ref(`chats/groups/${id}`).remove(),
+        db.ref(`groupMeta_multi/${id}`).remove(),
+        db.ref(`typingGroup/${id}`).remove(),
+      ]);
+      toast("تم حذف الجروب بالكامل");
+    };
+  });
+}
+
+let activeConvViewer = null;
+let convViewerRef = null;
+let activeConvViewerMsgsCache = {};
+function openConversationViewer(conv){
+  activeConvViewer = conv;
+  $("#convViewerTitle").textContent = conv.title;
+  $("#convViewer").classList.add("open");
+  $("#convViewer").setAttribute("aria-hidden","false");
+  $("#convViewerList").innerHTML = `<div class="empty-note">جاري التحميل...</div>`;
+  if (convViewerRef) convViewerRef.off();
+  convViewerRef = db.ref(conv.path);
+  convViewerRef.on("value", snap => { activeConvViewerMsgsCache = snap.val() || {}; renderConvMessages(activeConvViewerMsgsCache); });
+}
+function closeConversationViewer(){
+  $("#convViewer").classList.remove("open");
+  $("#convViewer").setAttribute("aria-hidden","true");
+  if (convViewerRef){ convViewerRef.off(); convViewerRef = null; }
+  activeConvViewer = null;
+  activeConvViewerMsgsCache = {};
+}
+function renderConvMessages(msgs){
+  const box = $("#convViewerList");
+  const rows = Object.entries(msgs).sort((a,b) => (a[1]?.createdAt||0) - (b[1]?.createdAt||0));
+  if (!rows.length){ box.innerHTML = `<div class="empty-note">لا توجد رسائل في هذه المحادثة</div>`; return; }
+  const banGroupId = activeConvViewer?.banGroupId;
+  box.innerHTML = rows.map(([id,m]) => {
+    const senderKey = safeKey(m.senderName);
+    const bannedHere = banGroupId ? !!state.bannedGroup?.[banGroupId]?.[senderKey] : false;
+    const banBtn = (banGroupId && m.senderId !== "admin") ? `<button class="mini-btn ${bannedHere?"":"danger"}" data-ban-key="${esc(senderKey)}" type="button">${bannedHere?"فك حظره من الجروب":"حظره من الجروب"}</button>` : "";
+    return `
+    <div class="msg-row">
+      <div class="msg-row-head">
+        <strong>${esc(m.senderName||"مستخدم")}</strong>
+        <span class="row-sub">${fmtTime(m.createdAt)}</span>
+        ${banBtn}
+        <button class="mini-btn danger" data-id="${esc(id)}" type="button">حذف</button>
+      </div>
+      ${m.deleted ? `<div class="msg-row-text">🚫 (تم حذفها بالفعل من المستخدم)</div>` : ""}
+      ${(!m.deleted && m.text) ? `<div class="msg-row-text">${esc(m.text)}</div>` : ""}
+      ${(!m.deleted && m.imageUrl) ? `<img src="${esc(m.displayUrl||m.imageUrl)}" class="msg-row-img" alt="">` : ""}
+    </div>`;
+  }).join("");
+  box.querySelectorAll("[data-id]").forEach(btn => {
+    btn.onclick = async () => {
+      if (!confirm("حذف هذه الرسالة نهائيًا من قاعدة البيانات؟")) return;
+      await db.ref(`${activeConvViewer.path}/${btn.dataset.id}`).remove();
+      toast("تم حذف الرسالة");
+    };
+  });
+  box.querySelectorAll("[data-ban-key]").forEach(btn => {
+    btn.onclick = async () => {
+      const key = btn.dataset.banKey;
+      const isBanned = !!state.bannedGroup?.[banGroupId]?.[key];
+      await db.ref(`bannedGroup/${banGroupId}/${key}`).set(isBanned ? null : true);
+      toast(isBanned ? "تم فك حظره من هذا الجروب" : "تم حظره من هذا الجروب");
+    };
+  });
+}
+$("#convViewerClose").onclick = closeConversationViewer;
+$("#convViewerClearAll").onclick = async () => {
+  if (!activeConvViewer) return;
+  if (!confirm(`مسح كل رسائل "${activeConvViewer.title}" نهائيًا؟ الإجراء ده مينفعش يترجع.`)) return;
+  await db.ref(activeConvViewer.path).remove();
+  await db.ref(activeConvViewer.metaPath).remove();
+  toast("تم مسح المحادثة بالكامل");
+};
+
+/* ---- إعلان لجروب مختار (العامة أو أي جروب تاني) ---- */
+function populateBroadcastTargets(){
+  const sel = $("#broadcastTarget");
+  if (!sel) return;
+  const prev = sel.value;
+  const opts = [`<option value="__group__">💬 المجموعة العامة</option>`];
+  Object.entries(state.groups||{}).forEach(([id,g]) => {
+    opts.push(`<option value="${esc(id)}">${esc((g?.icon||"👥"))} ${esc(g?.name||id)}</option>`);
+  });
+  sel.innerHTML = opts.join("");
+  if (prev && [...sel.options].some(o=>o.value===prev)) sel.value = prev;
+}
+$("#broadcastForm").onsubmit = async e => {
+  e.preventDefault();
+  const input = $("#broadcastInput");
+  const text = input.value.trim();
+  if (!text) return;
+  const targetId = $("#broadcastTarget").value || "__group__";
+  const isDefault = targetId === "__group__";
+  const msgsPath = isDefault ? "chats/private-chat/messages" : `chats/groups/${targetId}/messages`;
+  const metaPath = isDefault ? "groupMeta" : `groupMeta_multi/${targetId}`;
+  try{
+    const msgRef = db.ref(msgsPath).push();
+    await msgRef.set({
+      senderId: "admin",
+      senderName: "🛡️ الإدارة",
+      text: text.slice(0,2000),
+      imageUrl: "", displayUrl: "", thumbnail: "",
+      createdAt: firebase.database.ServerValue.TIMESTAMP
+    });
+    await db.ref(metaPath).set({
+      lastText: text.slice(0,80),
+      lastSenderName: "🛡️ الإدارة",
+      lastAt: firebase.database.ServerValue.TIMESTAMP
+    });
+    input.value = "";
+    toast("تم إرسال الإعلان 📢");
+  }catch(err){
+    toast("تعذر إرسال الإعلان: " + (err?.message||""), "error");
+  }
+};
+
+/* ---- التابات ---- */
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  };
+});
+
+$("#refreshBtn").onclick = loadAll;
+
+/* ---- التشغيل ---- */
+auth.signInAnonymously()
+  .then(() => { loadAll(); attachLiveListeners(); })
+  .catch(e => setTopStatus("تعذر الاتصال بفايربيز: " + (e?.message||""), "error"));
+</script>
+</body>
+</html>
